@@ -1,0 +1,148 @@
+<div id="navbar" class="navbar navbar-default navbar-static-top navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#/">Spell Buddy</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#/">Spells</a></li>
+                <li><a href="#/setup">Setup</a></li>
+                <li><a href="#/logout">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="" data-target="#collapse">
+                                {{ user.name }} Click to Edit
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapse" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <input type="text" class="form-control" ng-model="user.name" placeholder="Character Name">
+                            </div>
+                            <div class="form-group">
+                                <input type="email" class="form-control" ng-model="user.username" placeholder="Email">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" ng-model="user.password" placeholder="Password">
+                            </div>
+                            <button class="btn btn-primary btn-block" ng-click="saveUser()">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Spell
+                    <a href="" ng-click="clear()" class="pull-right">Clear</a>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" class="form-control" ng-model="spell.name" placeholder="Spell Name">
+                            </div>
+                            <div class="form-group">
+                                <label>School</label>
+                                <input type="text" class="form-control" ng-model="spell.school" placeholder="School">
+                            </div>
+                            <div class="form-group">
+                                <label>Level</label>
+                                <input type="text" class="form-control" ng-model="spell.level" placeholder="Level">
+                            </div>
+                            <div class="form-group">
+                                <label>Components</label>
+                                <input type="text" class="form-control" ng-model="spell.components" placeholder="Components">
+                            </div>
+                            <div class="form-group">
+                                <label>Casting Time</label>
+                                <input type="text" class="form-control" ng-model="spell.castingTime" placeholder="Casting Time">
+                            </div>
+                            <div class="form-group">
+                                <label>Range</label>
+                                <input type="text" class="form-control" ng-model="spell.spellRange" placeholder="Range">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Target</label>
+                                <input type="text" class="form-control" ng-model="spell.spellTarget" placeholder="Target">
+                            </div>
+                            <div class="form-group">
+                                <label>Effect</label>
+                                <input type="text" class="form-control" ng-model="spell.effect" placeholder="Effect">
+                            </div>
+                            <div class="form-group">
+                                <label>Area</label>
+                                <input type="text" class="form-control" ng-model="spell.area" placeholder="Area">
+                            </div>
+                            <div class="form-group">
+                                <label>Duration</label>
+                                <input type="text" class="form-control" ng-model="spell.spellDuration" placeholder="Duration">
+                            </div>
+                            <div class="form-group">
+                                <label>Saving Throw</label>
+                                <input type="text" class="form-control" ng-model="spell.savingThrow" placeholder="Saving Throw">
+                            </div>
+                            <div class="form-group">
+                                <label>Spell Resistance</label>
+                                <input type="text" class="form-control" ng-model="spell.spellResistance" placeholder="Spell Resistance">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea class="form-control" ng-model="spell.description" rows="5" style="resize:none;" placeholder="Description"></textarea>
+                    </div>
+                    <button class="btn btn-primary btn-block" ng-click="saveSpell()">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Spells</div>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Level</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="s in spells">
+                            <td>{{ s.name }}</td>
+                            <td>{{ s.level }}</td>
+                            <td><a href="" ng-click="edit(s.id)">Edit</a></td>
+                            <td><a href="" ng-click="delete(s.id)">Delete</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

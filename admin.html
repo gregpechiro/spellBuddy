@@ -1,0 +1,85 @@
+<br>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    User
+                    <a href="" ng-click="clear()" class="pull-right">Clear</a>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <input type="text" class="form-control" ng-model="user.name" placeholder="Character Name">
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-control" ng-model="user.username" placeholder="Email">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" ng-model="user.password" placeholder="Password">
+                    </div>
+                    <label>Active</label>
+                    <div class="form-group row">
+                        <div class="col-xs-2">
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" ng-model="user.active"value="1">
+                                    Yes
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-xs-2">
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" ng-model="user.active" value="0">
+                                    No
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <label>Role</label>
+                    <div class="form-group">
+                        <select class="form-control" ng-model="user.role">
+                            <option value="ROLE_USER">User</option>
+                            <option value="ROLE_ADMIN">Admin</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary btn-block" ng-click="save()">Save</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Users
+                    <a href="#/logout" class="pull-right">Logout</a>
+                </div>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Password</th>
+                            <th>Active</th>
+                            <th>Role</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="u in users">
+                            <td>{{ u.id }}</td>
+                            <td>{{ u.name }}</td>
+                            <td>{{ u.username }}</td>
+                            <td>{{ u.password }}</td>
+                            <td>{{ u.active == 1 }}</td>
+                            <td>{{ u.role }}</td>
+                            <td><a href="" ng-click="edit(u.id)">Edit</a></td>
+                            <td><a href="" ng-click="delete(u.id)">Delete</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
