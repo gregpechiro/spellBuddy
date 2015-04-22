@@ -22,59 +22,45 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-offset-1 col-lg-10">
-
-
-            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                <div class="panel panel-default">
-                    <div class="panel-heading" role="tab" id="headingOne">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion" href="" data-target="#collapseOne">
-                                Collapsible Group Item #1
-                            </a>
-                        </h4>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        Spells
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <div class="row text-center">
+                        <span ng-repeat="(level, spd) in user.spellsPerDay">
+                            <div ng-class="{'col-lg-offset-1': level === '0' || level === '5'}" class="col-lg-2">
+                                <strong>Level {{ level }}:</strong> {{ spd }}/Day
+                            </div>
+                        </span>
                     </div>
-                    <div id="collapseOne" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <div class="panel-group" id="accordionInner" role="tablist">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading" role="tab" id="headingOneInner">
-                                        <h4 class="panel-title">
-                                            <a data-toggle="collapse" data-parent="#accordionInner" href="" data-target="#collapseOneInner">
-                                                Collapsible Group Item #1
-                                            </a>
-                                        </h4>
-                                    </div>
-                                    <div id="collapseOneInner" class="panel-collapse collapse">
-                                        <div class="panel-body">
-                                            Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="panel panel-default">
-                                    <div class="panel-heading" role="tab" id="headingTwoInner">
-                                        <h4 class="panel-title">
-                                            <a class="collapsed" data-toggle="collapse" data-parent="#accordionInner" href="" data-target="#collapseTwoInner">
-                                                Collapsible Group Item #2
-                                            </a>
-                                        </h4>
-                                    </div>
-                                    <div id="collapseTwoInner" class="panel-collapse collapse">
-                                        <div class="panel-body">
-                                            Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="panel panel-default">
-                                    <div class="panel-heading" role="tab" id="headingThreeInner">
-                                        <h4 class="panel-title">
-                                            <a class="collapsed" data-toggle="collapse" data-parent="#accordionInner" href="" data-target="#collapseThreeInner">
-                                                Collapsible Group Item #3
-                                            </a>
-                                        </h4>
-                                    </div>
-                                    <div id="collapseThreeInner" class="panel-collapse collapse">
-                                        <div class="panel-body">
-                                            Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                    <br>
+                    <div class="panel-group" id="prepareAccordion" role="tablist" aria-multiselectable="true">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingPrepare">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#prepareAccordion" href="" data-target="#prepareCollapse">
+                                        Prepare Spells
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="prepareCollapse" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <div class="row text-center">
+                                        <span ng-repeat="(level, levelsSpells) in spells">
+                                            <div ng-class="{'col-lg-offset-1': level === '0' || level === '5'}" class="col-lg-2">
+                                                <label>Level {{ level }}</label>
+                                                <div class="checkbox text-left" ng-repeat="s in levelsSpells">
+                                                    <label>
+                                                        <input type="checkbox" ng-model="s.prepared" ng-disabled="prepared[level] === user.spellsPerDay[level] && !s.prepared" ng-click="prep(level, s.prepared)"> {{ s.name }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </span>
+                                        <div class="col-lg-offset-1 col-lg-10">
+                                            <button class="btn btn-primary btn-block" ng-click="rest()" data-toggle="collapse" data-target="#prepareCollapse">Rest</button>
                                         </div>
                                     </div>
                                 </div>
@@ -82,8 +68,59 @@
                         </div>
                     </div>
                 </div>
-
-
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-offset-1 col-lg-10">
+            <div class="panel-group" id="spellsAccordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default" ng-repeat="(level, levelsSpells) in spells">
+                    <div class="panel-heading" role="tab" id="heading{{ level }}">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#spellsAccordion" href="" data-target="#level{{ level }}Colapse">
+                                Level {{ level }} Spells
+                            </a>
+                            <span class="pull-right">Spells left today {{ user.spellsPerDay[level] - casted[level]}}</span>
+                        </h4>
+                    </div>
+                    <div id="level{{ level }}Colapse" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="panel-group" id="level{{ level }}Accordian" role="tablist">
+                                <div class="panel panel-default" ng-repeat="s in levelsSpells">
+                                    <div class="panel-heading" role="tab" id="heading{{ level }}Inner">
+                                        <h4 class="panel-title">
+                                            <a data-toggle="collapse" data-parent="#level{{ level }}Accordian" href="" data-target="#spell{{ s.id }}Colapse">
+                                                {{ s.name }}
+                                            </a>
+                                            <button class="btn btn-default btn-xs pull-right" ng-disabled="!s.prepared || ((user.spellsPerDay[level] - casted[level]) < 1)" ng-click="cast(level)">Cast</button>
+                                        </h4>
+                                    </div>
+                                    <div id="spell{{ s.id }}Colapse" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            <h4>{{ s.school }}<span ng-show="s.spellType"> [{{ s.spellType }}]</span></h4>
+                                            <table>
+                                                <tbody>
+                                                    <tr><td class="text-right"><strong>Level:</strong> &nbsp;</td><td class="text-left">{{ s.level }}</td></tr>
+                                                    <tr ng-show="s.components"><td class="text-right"><strong>Components:</strong> &nbsp;</td><td class="text-left">{{ s.components }}</td></tr>
+                                                    <tr ng-show="s.castingTime"><td class="text-right"><strong>Casting Time:</strong> &nbsp;</td><td class="text-left">{{ s.castingTime }}</td></tr>
+                                                    <tr ng-show="s.spellRange"><td class="text-right"><strong>Range:</strong> &nbsp;</td><td class="text-left">{{ s.spellRange }}</td></tr>
+                                                    <tr ng-show="s.area"><td class="text-right"><strong>Area:</strong> &nbsp;</td><td class="text-left">{{ s.area }}</td></tr>
+                                                    <tr ng-show="s.effect"><td class="text-right"><strong>Effect:</strong> &nbsp;</td><td class="text-left">{{ s.effect }}</td></tr>
+                                                    <tr ng-show="s.spellTarget"><td class="text-right"><strong>Target:</strong> &nbsp;</td><td class="text-left">{{ s.spellTarget }}</td></tr>
+                                                    <tr ng-show="s.spellDuration"><td class="text-right"><strong>Duration:</strong> &nbsp;</td><td class="text-left">{{ s.spellDuration }}</td></tr>
+                                                    <tr ng-show="s.savingThrow"><td class="text-right"><strong>Saving Throw:</strong> &nbsp;</td><td class="text-left">{{ s.savingThrow }}</td></tr>
+                                                    <tr ng-show="s.spellResistance"><td class="text-right"><strong>Spell Resistance:</strong> &nbsp;</td><td class="text-left">{{ s.spellResistance }}</td></tr>
+                                                </tbody>
+                                            </table>
+                                            <br>
+                                            <p>{{ s.description }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
