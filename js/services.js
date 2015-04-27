@@ -14,6 +14,14 @@ services.factory('SpellService', ['$resource', function($resource) {
     return $resource(host + '/user/:userId/spell/:spellId');
 }]);
 
+services.factory('DndSpellService', ['$resource', function($resource) {
+    return $resource(host + '/dndspell/:spellId');
+}]);
+
+services.factory('SpellSetupService', ['$resource', function($resource) {
+    return $resource(host + '/user/:userId/spellsetup/:setupId');
+}]);
+
 services.factory('LoginService', ['$http', '$cookieStore', function($http, $cookieStore) {
 
     var adminLogin = function() {

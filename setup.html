@@ -72,7 +72,33 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-9">
+        <div class="col-lg-6">
+            <div class="panel-group" id="dndSpellAccordion" role="tablist">
+                <div class="panel panel-default" ng-repeat="(i, dndSpell) in dndSpells">
+                    <div class="panel-heading clearfix" role="tab" id="heading{{ dndSpell.id }}">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#dndSpellAccordion" href="" data-target="#dndSpell{{ dndSpell.id }}">
+                                {{dndSpell.name}}
+                            </a>
+                            <div class="input-group pull-right col-lg-4 input-group-sm">
+                                <input type="text" class="form-control" placeholder="Level" ng-model="newLevel">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" ng-click="addSpell(newLevel, i)">Add Spell</button>
+                                </span>
+                            </div>
+                        </h4>
+                    </div>
+                    <div id="dndSpell{{ dndSpell.id }}" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <span ng-bind-html="dndSpell.descriptionHtml"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- <div class="col-lg-9">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h4 class="panel-title">
@@ -152,11 +178,12 @@
                     <button class="btn btn-primary btn-block" ng-click="saveSpell()" ng-disabled="!spellForm.$valid">Save</button>
                 </div>
             </div>
-        </div>
+        </div> -->
 
-        <div class="col-lg-3">
+        <div class="col-lg-6">
+
             <div class="panel-group" id="spellAccordion" role="tablist">
-                <div class="panel panel-default" ng-repeat="(level, levelsSpells) in spells">
+                <div class="panel panel-default" ng-repeat="(level, levelsSpells) in spellSetup" ng-if="isPicked(level) && levelsSpells.length > 0">
                     <div class="panel-heading" role="tab" id="heading{{ level }}">
                         <h4 class="panel-title">
                             <a data-toggle="collapse" data-parent="#spellAccordion" href="" data-target="#collapse{{ level }}">
@@ -166,13 +193,15 @@
                     </div>
                     <div id="collapse{{ level }}" class="panel-collapse collapse">
                         <div class="panel-body">
-                            <li class="list-group-item" ng-repeat="(i, s) in levelsSpells">
+                            <li class="list-group-item clearfix" ng-repeat="(i, s) in levelsSpells">
                                 {{ s.name }}
-                                <a href="" class="pull-right" ng-click="preDelete(s.id)">Delete</a>
-                                <span class="pull-right">
-                                    <a href="" ng-click="edit(level, i)">Edit</a>
-                                    &nbsp;
-                                </span>
+                                <div class="input-group pull-right col-lg-5 input-group-sm">
+                                    <input type="text" class="form-control" placeholder="Level" ng-model="newLevel">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" ng-click="changeLevel(level, newLevel, i)">Change Level</button>
+                                        <button class="btn btn-danger" ng-click="addSpell(i)">Delete</button>
+                                    </span>
+                                </div>
                             </li>
                         </div>
                     </div>

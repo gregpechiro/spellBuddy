@@ -62,22 +62,67 @@ controllers.controller('SpellBuddyController', ['$scope', '$cookieStore', 'Spell
 
 }]);
 
-controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserService', 'SpellService',
-    function($scope, $cookieStore, UserService, SpellService) {
+controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserService', 'SpellService', 'DndSpellService', 'SpellSetupService',
+    function($scope, $cookieStore, UserService, SpellService, DndSpellService, SpellSetupService) {
 
     $scope.user = $cookieStore.get('user');
     var userId = $scope.user.id
     $scope.spells = SpellService.get({userId:userId, spellId: 'order'});
+    $scope.dndSpells = DndSpellService.query();
+    $scope.spellSetup = SpellSetupService.get({userId:userId});
+
+    $scope.addSpell = function(level, index) {
+        if ($scope.spellSetup.userId === undefined) {
+            $scope.spellSetup =
+            {
+                userId: userId,
+                known0:0,
+                known1:0,
+                known2:0,
+                known3:0,
+                known4:0,
+                known5:0,
+                known6:0,
+                known7:0,
+                known8:0,
+                known9:0,
+                picked0:[],
+                picked1:[],
+                picked2:[],
+                picked3:[],
+                picked4:[],
+                picked5:[],
+                picked6:[],
+                picked7:[],
+                picked8:[],
+                picked9:[]
+            }
+        }
+        $scope.spellSetup['picked' + level].push($scope.dndSpells[index]);
+        SpellSetupService.save({userId: userId}, $scope.spellSetup);
+        level = '';
+    };
+
+    $scope.changeLevel = function(current, newLevel, index) {
+        var spell = $scope.spellSetup[current][index];
+        $scope.spellSetup[current] = $scope.spellSetup[current].slice(0, index).concat($scope.spellSetup[current].slice((index + 1), $scope.spellSetup[current].length));
+        if ($scope.spellSetup[current] === '') {
+            $scope.spellSetup[current] = [];
+        }
+        $scope.spellSetup['picked' + newLevel].push(spell);
+        SpellSetupService.save({userId: userId}, $scope.spellSetup);
+    }
 
     $scope.edit = function(level, index) {
         $scope.spell = $scope.spells[level][index];
 	};
 
     $scope.delete = function(spellId) {
-	    SpellService.delete({userId: userId, spellId:spellId}).$promise.then(function() {
-            $scope.spells = SpellService.get({userId:userId, spellId: 'order'});
-            $scope.toDelete = 0;
-        });
+	    // SpellService.delete({userId: userId, spellId:spellId}).$promise.then(function() {
+        //     $scope.spells = SpellService.get({userId:userId, spellId: 'order'});
+        //     $scope.toDelete = 0;
+        // });
+
 	}
 
     $scope.clear = function() {
@@ -108,6 +153,10 @@ controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserServic
 
     $scope.preDelete = function(id) {
         $scope.toDelete = id
+    }
+
+    $scope.isPicked = function(key) {
+        return key.startsWith('picked');
     }
 
 }]);

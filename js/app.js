@@ -5,6 +5,7 @@
 var app = angular.module('spellBuddy', [
 	'ngRoute',
 	'ngCookies',
+	'ngSanitize',
 	'controllers',
 	'services'
 ]);
