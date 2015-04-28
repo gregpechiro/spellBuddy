@@ -73,6 +73,9 @@
     </div>
     <div class="row">
         <div class="col-lg-6">
+            <div class="text-center">
+                <a href="" ng-repeat="let in letters" ng-class="{'text-danger':letter === let}" ng-click="getFirstLetter(let)"> {{ let }} </a>
+            </div>
             <div class="panel-group" id="dndSpellAccordion" role="tablist">
                 <div class="panel panel-default" ng-repeat="(i, dndSpell) in dndSpells">
                     <div class="panel-heading clearfix" role="tab" id="heading{{ dndSpell.id }}">
@@ -199,7 +202,7 @@
                                     <input type="text" class="form-control" placeholder="Level" ng-model="newLevel">
                                     <span class="input-group-btn">
                                         <button class="btn btn-default" ng-click="changeLevel(level, newLevel, i)">Change Level</button>
-                                        <button class="btn btn-danger" ng-click="addSpell(i)">Delete</button>
+                                        <button class="btn btn-danger" ng-click="delete(level, i)">Delete</button>
                                     </span>
                                 </div>
                             </li>

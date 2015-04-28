@@ -65,10 +65,12 @@ controllers.controller('SpellBuddyController', ['$scope', '$cookieStore', 'Spell
 controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserService', 'SpellService', 'DndSpellService', 'SpellSetupService',
     function($scope, $cookieStore, UserService, SpellService, DndSpellService, SpellSetupService) {
 
+    $scope.letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
     $scope.user = $cookieStore.get('user');
     var userId = $scope.user.id
     $scope.spells = SpellService.get({userId:userId, spellId: 'order'});
-    $scope.dndSpells = DndSpellService.query();
+    $scope.letter = 'A';
+    $scope.dndSpells = DndSpellService.query({search: $scope.letter});
     $scope.spellSetup = SpellSetupService.get({userId:userId});
 
     $scope.addSpell = function(level, index) {
@@ -113,17 +115,37 @@ controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserServic
         SpellSetupService.save({userId: userId}, $scope.spellSetup);
     }
 
+    $scope.getFirstLetter = function(letter) {
+        $scope.letter = letter;
+        $scope.dndSpells = DndSpellService.query({search: $scope.letter});
+    };
+
+    $scope.delete = function(current, index) {
+        $scope.spellSetup[current] = $scope.spellSetup[current].slice(0, index).concat($scope.spellSetup[current].slice((index + 1), $scope.spellSetup[current].length));
+        if ($scope.spellSetup[current] === '') {
+            $scope.spellSetup[current] = [];
+        }
+        SpellSetupService.save({userId: userId}, $scope.spellSetup);
+	}
+
+    $scope.isPicked = function(key) {
+        return key.startsWith('picked');
+    }
+
+    function getSpells() {
+        DndSpellService.query({search: $scope.letter}).$promise.then(function(data) {
+            $scope.dndSpells = data;
+
+        });
+    }
+
+
+
+
     $scope.edit = function(level, index) {
         $scope.spell = $scope.spells[level][index];
 	};
 
-    $scope.delete = function(spellId) {
-	    // SpellService.delete({userId: userId, spellId:spellId}).$promise.then(function() {
-        //     $scope.spells = SpellService.get({userId:userId, spellId: 'order'});
-        //     $scope.toDelete = 0;
-        // });
-
-	}
 
     $scope.clear = function() {
         $scope.spell = {};
@@ -155,9 +177,6 @@ controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserServic
         $scope.toDelete = id
     }
 
-    $scope.isPicked = function(key) {
-        return key.startsWith('picked');
-    }
 
 }]);
 
