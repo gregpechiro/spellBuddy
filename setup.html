@@ -40,30 +40,30 @@
         </div>
     </div>
 </div>
-<div class="container">
+<div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
-            <div class="panel-group" id="userAccordion" role="tablist" aria-multiselectable="true">
+            <div class="panel-group" id="spdAccordion" role="tablist" aria-multiselectable="true">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#userAccordion" href="" data-target="#userCollapse">
+                            <a data-toggle="collapse" data-parent="#spdAccordion" href="" data-target="#spdCollapse">
                                 Spells Per Day Click to Edit
                             </a>
                         </h4>
                     </div>
-                    <div id="userCollapse" class="panel-collapse collapse">
+                    <div id="spdCollapse" class="panel-collapse collapse">
                         <div class="panel-body">
-                            <form name="userForm">
-                                <div ng-class="{'col-lg-offset-1': level === '0' || level === '5'}" class="col-lg-2" ng-repeat="(level, spd) in user.spellsPerDay">
+                            <form name="spdForm">
+                                <div ng-class="{'col-lg-offset-1': level === 'known0' || level === 'known5'}" class="col-lg-2" ng-repeat="(level, spd) in spellSetup" ng-if="isKnown(level)">
                                     <div class="form-group">
-                                        <label>Level {{ level }}</label>
-                                        <input type="number" min=0 class="form-control" ng-model="user.spellsPerDay[level]" placeholder="Level {{ level }}" required="true">
+                                        <label>Level {{ level | setup }}</label>
+                                        <input type="number" min=0 class="form-control" ng-model="spellSetup[level]" placeholder="Level {{ level | setup}}" required="true">
                                     </div>
                                 </div>
                             </form>
                             <div class="col-lg-offset-1 col-lg-10">
-                                <button class="btn btn-primary btn-block" ng-click="saveUser()" ng-disabled="!userForm.$valid" data-toggle="collapse" data-target="#userCollapse">Save</button>
+                                <button class="btn btn-primary btn-block" ng-click="saveSpellsKnown()" ng-disabled="!spdForm.$valid" data-toggle="collapse" data-target="#spdCollapse">Save</button>
                             </div>
                         </div>
                     </div>
@@ -73,30 +73,42 @@
     </div>
     <div class="row">
         <div class="col-lg-6">
-            <div class="text-center">
+            <div class="">
                 <div class="row">
-                    <a href="" ng-repeat="let in letters" ng-class="{'text-danger':letter === let}" ng-click="getFirstLetter(let)"> {{ let }} </a>
+                    <div class="col-lg-12 text-center">
+                        <span ng-repeat="let in letters" ng-click="getFirstLetter(let)" ng-class="{'label-primary':letter === let, 'label-default': letter !== let}" class="label">{{let}}</span>&nbsp;
+                    </div>
                 </div>
-
-
-                <!-- <ul class="pagination pagination-sm">
-                    <li ng-repeat="let in letters" ng-class="{'active': letter === let}"><a href="" ng-click="getFirstLetter(let)">{{let}}</a></li>
-                </ul> -->
-
                 <div class="row">
-                    <ul class="pagination">
-                        <li ng-class="{'disabled' : lb === page}">
-                            <a href="" aria-label="Previous" ng-click="showSpells(page - 1)" ng-class="{'disabled' : lb === page}">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        <li ng-repeat="i in [] | range:this" ng-class="{'active': i === page}"><a href="" ng-click="showSpells(i)">{{i}}</a></li>
-                        <li ng-class="{'disabled' : page === ub}">
-                            <a href="" ng-click="showSpells(page + 1)">
-                                <span>&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
+                    <div class="col-lg-7">
+                        <ul class="pagination pagination-sm">
+                            <li ng-class="{'disabled' : lb === page}">
+                                <a href="" aria-label="Previous" ng-click="showSpells(page - 1)" ng-class="{'disabled' : lb === page}">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li ng-repeat="i in [] | range:this" ng-class="{'active': i === page}"><a href="" ng-click="showSpells(i)">{{i}}</a></li>
+                            <li ng-class="{'disabled' : page === ub}">
+                                <a href="" ng-click="showSpells(page + 1)">
+                                    <span>&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-5 pagination">
+                        <form class="form-horizontal">
+                            <label class="col-lg-7 control-label">Spells per page</label>
+                            <div class="col-lg-5">
+                                <select class="form-control" ng-model="pageSize" ng-change="showSpells(page)">
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
             </div>
@@ -110,7 +122,7 @@
                             <div class="input-group pull-right col-lg-4 input-group-sm">
                                 <input type="text" class="form-control" placeholder="Level" ng-model="newLevel">
                                 <span class="input-group-btn">
-                                    <button class="btn btn-default" ng-click="addSpell(newLevel, i)">Add Spell</button>
+                                    <button class="btn btn-default" ng-click="addSpell(newLevel, i); newLevel = ''">Add Spell</button>
                                 </span>
                             </div>
                         </h4>
@@ -208,28 +220,34 @@
         </div> -->
 
         <div class="col-lg-6">
-
-            <div class="panel-group" id="spellAccordion" role="tablist">
-                <div class="panel panel-default" ng-repeat="(level, levelsSpells) in spellSetup" ng-if="isPicked(level) && levelsSpells.length > 0">
-                    <div class="panel-heading" role="tab" id="heading{{ level }}">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#spellAccordion" href="" data-target="#collapse{{ level }}">
-                                Level {{ level | picked }} Spells
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="collapse{{ level }}" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <li class="list-group-item clearfix" ng-repeat="(i, s) in levelsSpells">
-                                {{ s.name }}
-                                <div class="input-group pull-right col-lg-5 input-group-sm">
-                                    <input type="text" class="form-control" placeholder="Level" ng-model="newLevel">
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-default" ng-click="changeLevel(level, newLevel, i)">Change Level</button>
-                                        <button class="btn btn-danger" ng-click="delete(level, i)">Delete</button>
-                                    </span>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Spells Known/Favorite Spells
+                </div>
+                <div class="panel-body">
+                    <div class="panel-group" id="spellAccordion" role="tablist">
+                        <div class="panel panel-default" ng-repeat="(level, levelsSpells) in spellSetup" ng-if="isPicked(level) && levelsSpells.length > 0">
+                            <div class="panel-heading" role="tab" id="heading{{ level }}">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#spellAccordion" href="" data-target="#collapse{{ level }}">
+                                        Level {{ level | setup }} Spells
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapse{{ level }}" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <li class="list-group-item clearfix" ng-repeat="(i, s) in levelsSpells">
+                                        {{ s.name }}
+                                        <div class="input-group pull-right col-lg-5 input-group-sm">
+                                            <input type="text" class="form-control" placeholder="Level" ng-model="newLevel">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default" ng-click="changeLevel(level, newLevel, i)">Change Level</button>
+                                                <button class="btn btn-danger" ng-click="delete(level, i)">Delete</button>
+                                            </span>
+                                        </div>
+                                    </li>
                                 </div>
-                            </li>
+                            </div>
                         </div>
                     </div>
                 </div>

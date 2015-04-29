@@ -9,8 +9,9 @@ filters.filter('range', function() {
     };
 });
 
-filters.filter('picked', function() {
+filters.filter('setup', function() {
     return function(input) {
-        return input.replace('picked', '');
+        input = input.replace('picked', '');
+        return input.replace('known', '');
     };
 });
