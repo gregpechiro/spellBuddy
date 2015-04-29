@@ -7,7 +7,8 @@ var app = angular.module('spellBuddy', [
 	'ngCookies',
 	'ngSanitize',
 	'controllers',
-	'services'
+	'services',
+	'filters'
 ]);
 
 app.config(['$routeProvider', function($routeProvider) {

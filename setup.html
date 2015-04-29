@@ -74,10 +74,34 @@
     <div class="row">
         <div class="col-lg-6">
             <div class="text-center">
-                <a href="" ng-repeat="let in letters" ng-class="{'text-danger':letter === let}" ng-click="getFirstLetter(let)"> {{ let }} </a>
+                <div class="row">
+                    <a href="" ng-repeat="let in letters" ng-class="{'text-danger':letter === let}" ng-click="getFirstLetter(let)"> {{ let }} </a>
+                </div>
+
+
+                <!-- <ul class="pagination pagination-sm">
+                    <li ng-repeat="let in letters" ng-class="{'active': letter === let}"><a href="" ng-click="getFirstLetter(let)">{{let}}</a></li>
+                </ul> -->
+
+                <div class="row">
+                    <ul class="pagination">
+                        <li ng-class="{'disabled' : lb === page}">
+                            <a href="" aria-label="Previous" ng-click="showSpells(page - 1)" ng-class="{'disabled' : lb === page}">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li ng-repeat="i in [] | range:this" ng-class="{'active': i === page}"><a href="" ng-click="showSpells(i)">{{i}}</a></li>
+                        <li ng-class="{'disabled' : page === ub}">
+                            <a href="" ng-click="showSpells(page + 1)">
+                                <span>&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
             <div class="panel-group" id="dndSpellAccordion" role="tablist">
-                <div class="panel panel-default" ng-repeat="(i, dndSpell) in dndSpells">
+                <div class="panel panel-default" ng-repeat="(i, dndSpell) in displaySpells">
                     <div class="panel-heading clearfix" role="tab" id="heading{{ dndSpell.id }}">
                         <h4 class="panel-title">
                             <a data-toggle="collapse" data-parent="#dndSpellAccordion" href="" data-target="#dndSpell{{ dndSpell.id }}">
@@ -190,7 +214,7 @@
                     <div class="panel-heading" role="tab" id="heading{{ level }}">
                         <h4 class="panel-title">
                             <a data-toggle="collapse" data-parent="#spellAccordion" href="" data-target="#collapse{{ level }}">
-                                Level {{ level }} Spells
+                                Level {{ level | picked }} Spells
                             </a>
                         </h4>
                     </div>

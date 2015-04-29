@@ -70,7 +70,14 @@ controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserServic
     var userId = $scope.user.id
     $scope.spells = SpellService.get({userId:userId, spellId: 'order'});
     $scope.letter = 'A';
-    $scope.dndSpells = DndSpellService.query({search: $scope.letter});
+    $scope.beginning = 0;
+    $scope.pageSize = 10;
+    $scope.pages = 1;
+
+    DndSpellService.query({search: $scope.letter}).$promise.then(function(data) {
+        $scope.dndSpells = data;
+        $scope.showSpells(1);
+    });
     $scope.spellSetup = SpellSetupService.get({userId:userId});
 
     $scope.addSpell = function(level, index) {
@@ -117,7 +124,10 @@ controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserServic
 
     $scope.getFirstLetter = function(letter) {
         $scope.letter = letter;
-        $scope.dndSpells = DndSpellService.query({search: $scope.letter});
+        DndSpellService.query({search: $scope.letter}).$promise.then(function(data) {
+            $scope.dndSpells = data;
+            $scope.showSpells(1);
+        });
     };
 
     $scope.delete = function(current, index) {
@@ -132,11 +142,22 @@ controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserServic
         return key.startsWith('picked');
     }
 
-    function getSpells() {
-        DndSpellService.query({search: $scope.letter}).$promise.then(function(data) {
-            $scope.dndSpells = data;
+    $scope.showSpells = function(page) {
+        if (page <= $scope.pages && page >= 1) {
+            $scope.page = page;
+            $scope.beginning = (page - 1) * $scope.pageSize;
+            $scope.displaySpells = $scope.dndSpells.slice($scope.beginning, ($scope.beginning + $scope.pageSize));
+            $scope.pages = Math.ceil($scope.dndSpells.length / $scope.pageSize);
+            $scope.currentPage = page
+            $scope.ub = ((($scope.pages - $scope.currentPage) >= 4) ? $scope.currentPage + 4 : $scope.pages);
+            if ($scope.currentPage < 6) {
+                $scope.ub = (($scope.pages > 10) ? 10 : $scope.pages);
+            }
+            $scope.lb = ( ( ($scope.ub - 9) > 0) ? $scope.ub - 9 : 1)
+        }
 
-        });
+        // (beg / pagesize) +1 = current
+        //(current-1) * pageSize = beg
     }
 
 
