@@ -129,6 +129,9 @@
                     </div>
                     <div id="dndSpell{{ dndSpell.id }}" class="panel-collapse collapse">
                         <div class="panel-body">
+                            <p ng-show="dndSpell.rulebook">
+                                Rulebook: {{dndSpell.rulebook}}<span ng-show="dndSpell.page"> p. {{dndSpell.page}}</span>
+                            </p>
                             <span ng-bind-html="dndSpell.descriptionHtml"></span>
                         </div>
                     </div>
