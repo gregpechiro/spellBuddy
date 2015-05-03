@@ -22,6 +22,17 @@ services.factory('SpellSetupService', ['$resource', function($resource) {
     return $resource(host + '/user/:userId/spellsetup/:setupId');
 }]);
 
+services.factory('TraditionalService', ['$resource', function($resource) {
+    return $resource(host + '/user/:userId/traditional/:traditioanlId');
+}]);
+
+services.factory('PowerPointsService', ['$resource', function($resource) {
+    return $resource(host + '/user/:userId/powerPoints/:powerPointsId');
+}]);
+
+
+
+
 services.factory('LoginService', ['$http', '$cookieStore', function($http, $cookieStore) {
 
     var adminLogin = function() {

@@ -41,10 +41,12 @@
     </div>
 </div>
 <div class="container-fluid">
+
     <div class="row">
         <div class="col-lg-12">
             <div class="panel-group" id="spdAccordion" role="tablist" aria-multiselectable="true">
-                <div class="panel panel-default">
+
+                <div class="panel panel-default" ng-if="!user.powerPoints">
                     <div class="panel-heading">
                         <h4 class="panel-title">
                             <a data-toggle="collapse" data-parent="#spdAccordion" href="" data-target="#spdCollapse">
@@ -55,10 +57,10 @@
                     <div id="spdCollapse" class="panel-collapse collapse">
                         <div class="panel-body">
                             <form name="spdForm">
-                                <div ng-class="{'col-lg-offset-1': level === 'known0' || level === 'known5'}" class="col-lg-2" ng-repeat="(level, spd) in spellSetup" ng-if="isKnown(level)">
+                                <div class="col-lg-2" ng-class="{'col-lg-offset-1': level === 0 || level === 5}" ng-repeat="(level, spd) in traditional.knownSpells track by $index">
                                     <div class="form-group">
-                                        <label>Level {{ level | setup }}</label>
-                                        <input type="number" min=0 class="form-control" ng-model="spellSetup[level]" placeholder="Level {{ level | setup}}" required="true">
+                                        <label>Level {{ level }}</label>
+                                        <input type="number" min=0 class="form-control" ng-model="traditional.knownSpells[level]" placeholder="Level {{ level }}" required="true">
                                     </div>
                                 </div>
                             </form>
@@ -69,10 +71,25 @@
                     </div>
                 </div>
             </div>
+            <div class="panel panel-default" ng-if="user.powerPoints">
+                <div class="panel-heading clearfix">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="pp" class="col-lg-2 control-label">Total Power Points</label>
+                            <div class="col-lg-2">
+                                <input type="number" class="form-control" id="pp" ng-model="powerPoints.totalPoints" placeholder="Power Points">
+                            </div>
+                            <a class="btn btn-default" ng-click="savePP()">Save</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-7">
             <div class="">
                 <div class="row">
                     <div class="col-lg-12 text-center">
@@ -80,7 +97,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-7">
+                    <div class="col-lg-8">
                         <ul class="pagination pagination-sm">
                             <li ng-class="{'disabled' : lb === page}">
                                 <a href="" aria-label="Previous" ng-click="showSpells(page - 1)" ng-class="{'disabled' : lb === page}">
@@ -95,7 +112,7 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="col-lg-5 pagination">
+                    <div class="col-lg-4 pagination">
                         <form class="form-horizontal">
                             <label class="col-lg-7 control-label">Spells per page</label>
                             <div class="col-lg-5">
@@ -222,7 +239,7 @@
             </div>
         </div> -->
 
-        <div class="col-lg-6">
+        <div class="col-lg-5">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     Spells Known/Favorite Spells
@@ -241,7 +258,7 @@
                                 <div class="panel-body">
                                     <li class="list-group-item clearfix" ng-repeat="(i, s) in levelsSpells">
                                         {{ s.name }}
-                                        <div class="input-group pull-right col-lg-5 input-group-sm">
+                                        <div class="input-group pull-right col-lg-6 input-group-sm">
                                             <input type="text" class="form-control" placeholder="Level" ng-model="newLevel">
                                             <span class="input-group-btn">
                                                 <button class="btn btn-default" ng-click="changeLevel(level, newLevel, i)">Change Level</button>

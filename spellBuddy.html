@@ -22,7 +22,9 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-offset-1 col-lg-10">
-            <div class="panel panel-default">
+
+
+            <div class="panel panel-default" ng-if="!user.powerPoints">
                 <div class="panel-heading">
                     <h4 class="panel-title">
                         Spells
@@ -30,8 +32,8 @@
                 </div>
                 <div class="panel-body">
                     <div class="row text-center">
-                        <div ng-class="{'col-lg-offset-1': level === 'known0' || level === 'known5'}" class="col-lg-2" ng-repeat="(level, spd) in spellSetup" ng-if="isKnown(level)">
-                            <strong>Level {{ level | setup }}:</strong> {{ spd }}/Day
+                        <div ng-class="{'col-lg-offset-1': level === 0 || level === 5}" class="col-lg-2" ng-repeat="(level, spd) in traditional.knownSpells">
+                            <strong>Level {{ level }}:</strong> {{ spd }}/Day
                         </div>
                     </div>
                     <br>
@@ -46,12 +48,14 @@
                             </div>
                             <div id="prepareCollapse" class="panel-collapse collapse">
                                 <div class="panel-body">
+                                    {{traditional}}
                                     <div class="row text-center">
                                         <div ng-class="{'col-lg-offset-1': level === 'picked0' || level === 'picked5'}" class="col-lg-2" ng-repeat="(level, levelsSpells) in spellSetup" ng-if="isPicked(level) && levelsSpells.length > 0">
                                             <label>Level {{ level | setup }}</label>
                                             <div class="checkbox text-left" ng-repeat="s in levelsSpells">
                                                 <label>
-                                                    <input type="checkbox" ng-model="s.prepared" ng-disabled="prepared[level] === user.spellsPerDay[level] && !s.prepared" ng-click="prep(level, s.prepared)"> {{ s.name }}
+                                                    <!-- <input type="checkbox" ng-model="s.prepared" ng-disabled="prepared[level] === user.spellsPerDay[level] && !s.prepared" ng-click="prep(level, s.prepared)"> {{ s.name }} -->
+                                                    <input type="checkbox" ng-model="stuff" ng-click="prep(s.id, level, stuff)"> {{ s.name }}
                                                 </label>
                                             </div>
                                         </div>
@@ -65,6 +69,8 @@
                     </div>
                 </div>
             </div>
+
+
         </div>
     </div>
     <div class="row">

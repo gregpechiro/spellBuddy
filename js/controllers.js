@@ -4,7 +4,8 @@
 
 var controllers = angular.module('controllers', []);
 
-controllers.controller('AdminController', ['$scope', 'UserService', function($scope, UserService) {
+controllers.controller('AdminController', ['$scope', 'UserService', 'PowerPointsService', 'TraditionalService', 'SpellSetupService',
+function($scope, UserService, PowerPointsService, TraditionalService, SpellSetupService) {
 
     $scope.users = UserService.query();
 
@@ -13,7 +14,6 @@ controllers.controller('AdminController', ['$scope', 'UserService', function($sc
 	};
 
     $scope.delete = function(userId) {
-        console.log(userId);
 	    UserService.delete({userId:userId}).$promise.then(function() {
             $scope.users = UserService.query();
         });
@@ -24,55 +24,103 @@ controllers.controller('AdminController', ['$scope', 'UserService', function($sc
     };
 
     $scope.save = function() {
-        if ($scope.user.id === null || $scope.user.id === undefined || $scope.user.id === '') {
-            $scope.user.spellsPerDay =
-            {'0': 0,'1': 0,'2': 0,'3': 0,'4': 0,'5': 0,'6': 0,'7': 0,'8': 0,'9': 0,};
-        }
-        UserService.save($scope.user).$promise.then(function() {
+        var isNew = ($scope.user.id === null || $scope.user.id === undefined || $scope.user.id === '');
+        UserService.save($scope.user).$promise.then(function(data) {
             $scope.users = UserService.query();
             $scope.user = {};
+            if (isNew) {
+                var setup = {userId: data.id}
+                if (data.powerPoints) {
+                    PowerPointsService.save({userId: data.id}, setup);
+                } else {
+                    setup.knownSpells = [0,0,0,0,0,0,0,0,0,0];
+                    setup.remainingSpells = [0,0,0,0,0,0,0,0,0,0];
+                    TraditionalService.save({userId: data.id}, setup);
+                }
+                var spellSetup = {
+                    userId: data.id,
+                    picked0: [],
+                    picked1: [],
+                    picked2: [],
+                    picked3: [],
+                    picked4: [],
+                    picked5: [],
+                    picked6: [],
+                    picked7: [],
+                    picked8: [],
+                    picked9: []
+                }
+                SpellSetupService.save({userId: data.id}, spellSetup);
+            }
         });
     }
 
 }]);
 
-controllers.controller('SpellBuddyController', ['$scope', '$cookieStore', 'SpellService', 'SpellSetupService', function($scope, $cookieStore, SpellService, SpellSetupService) {
+controllers.controller('SpellBuddyController', ['$scope', '$cookieStore', 'SpellService', 'SpellSetupService', 'PowerPointsService', 'TraditionalService',
+function($scope, $cookieStore, SpellService, SpellSetupService, PowerPointsService, TraditionalService) {
 
     $scope.user = $cookieStore.get('user');
     var userId = $scope.user.id
     $scope.spells = SpellService.get({userId:userId, spellId: 'order'});
-    $scope.prepared = {'known0': 0,'known1': 0,'known2': 0,'known3': 0,'known4': 0,'known5': 0,'known6': 0,'known7': 0,'known8': 0,'known9': 0};
-    $scope.casted = {'known0': 0,'known1': 0,'known2': 0,'known3': 0,'known4': 0,'known5': 0,'known6': 0,'known7': 0,'known8': 0,'known9': 0};
-    $scope.spellSetup = SpellSetupService.get({userId:userId})
+    $scope.spellSetup = SpellSetupService.get({userId:userId});
+    if ($scope.user.powerPoints) {
+        $scope.powerPoints = PowerPointsService.get({userId: $scope.user.id});
+    } else {
+        $scope.traditional = TraditionalService.get({userId: $scope.user.id});
+    }
+    //$scope.prepared = {'known0': 0,'known1': 0,'known2': 0,'known3': 0,'known4': 0,'known5': 0,'known6': 0,'known7': 0,'known8': 0,'known9': 0};
+    //$scope.casted = {'known0': 0,'known1': 0,'known2': 0,'known3': 0,'known4': 0,'known5': 0,'known6': 0,'known7': 0,'known8': 0,'known9': 0};
 
-    $scope.prep = function(level, plus) {
-        plus ? $scope.prepared[level]++ : $scope.prepared[level]--;
+
+    $scope.prep = function(id, level, plus) {
+        var spellId = parseInt(id);
+        if (plus) {
+            $scope.traditional[level.replace('picked', 'prepared')].push(spellId);
+        } else {
+            $scope.traditional[level.replace('picked', 'prepared')] = removeValue($scope.traditional['prepared' + level.replace('picked', '')], spellId);
+        }
     };
 
+    $scope.isPrepared(spellId) = function() {
+        return $.inArray(spellId, $scope.traditional[level.replace('picked', 'prepared')]); > 0;
+    };
+
+
+
     $scope.cast = function(level) {
-        $scope.casted[level]++;
+        if ($scope.user.powerPoints) {
+            $scope.powerPoints.remainingPoints--;
+            PowerPointsService.save({userId: userId}, $scope.powerPoints);
+        } else {
+            $scope.traditional.remainingSpells[level]--;
+            TraditionalService.save({userId:userId}, $scope.traditional);
+        }
     };
 
     $scope.rest = function() {
-        $scope.casted = {'known0': 0,'known1': 0,'known2': 0,'known3': 0,'known4': 0,'known5': 0,'known6': 0,'known7': 0,'known8': 0,'known9': 0};
+        if ($scope.user.powerPoints) {
+            $scope.powerPoints.remainingPoints = $scope.PowerPoints.totalPoints;
+            PowerPointsService.save({userId: userId}, $scope.powerPoints);
+        } else {
+            $scope.traditional.remainingSpells = $scope.traditional;
+            TraditionalService.save({userId:userId}, $scope.traditional.knownSpells);
+        }
+        //$scope.casted = {'known0': 0,'known1': 0,'known2': 0,'known3': 0,'known4': 0,'known5': 0,'known6': 0,'known7': 0,'known8': 0,'known9': 0};
     };
 
     $scope.isPicked = function(key) {
         return key.startsWith('picked');
     }
-
-    $scope.isKnown = function(key) {
-        return key.startsWith('known');
-    }
-
-    // $scope.isEven = function(num) {
-    //     return (parseInt(num)) % 2 === 0;
-    // };
+    //
+    // $scope.isKnown = function(key) {
+    //     return key.startsWith('known');
+    // }
 
 }]);
 
-controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserService', 'SpellService', 'DndSpellService', 'SpellSetupService',
-    function($scope, $cookieStore, UserService, SpellService, DndSpellService, SpellSetupService) {
+controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserService', 'SpellService', 'DndSpellService', 'SpellSetupService', 'PowerPointsService', 'TraditionalService',
+    function($scope, $cookieStore, UserService, SpellService, DndSpellService, SpellSetupService, PowerPointsService, TraditionalService) {
 
     $scope.letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
     $scope.user = $cookieStore.get('user');
@@ -82,6 +130,12 @@ controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserServic
     $scope.beginning = 0;
     $scope.pageSize = 10;
 
+    if ($scope.user.powerPoints) {
+        $scope.powerPoints = PowerPointsService.get({userId: $scope.user.id});
+    } else {
+        $scope.traditional = TraditionalService.get({userId: $scope.user.id});
+    }
+
     DndSpellService.query({search: $scope.letter}).$promise.then(function(data) {
         $scope.dndSpells = data;
         $scope.showSpells(1);
@@ -89,9 +143,9 @@ controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserServic
 
     SpellSetupService.get({userId:userId}).$promise.then(function(data) {
         $scope.spellSetup = data;
-        if ($scope.spellSetup.userId === undefined) {
-            initSpellSetup();
-        }
+        //if ($scope.spellSetup.userId === undefined) {
+        //    initSpellSetup();
+        //}
     });
 
     $scope.addSpell = function(level, index) {
@@ -139,7 +193,7 @@ controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserServic
         if (page <= $scope.pages && page >= 1) {
             $scope.page = page;
             $scope.beginning = (page - 1) * $scope.pageSize;
-            $scope.displaySpells = $scope.dndSpells.slice($scope.beginning, ($scope.beginning + $scope.pageSize));
+            $scope.displaySpells = $scope.dndSpells.slice($scope.beginning, (parseInt($scope.beginning) + parseInt($scope.pageSize)));
             $scope.currentPage = page
             $scope.ub = ((($scope.pages - $scope.currentPage) >= 4) ? $scope.currentPage + 4 : $scope.pages);
             if ($scope.currentPage < 6) {
@@ -150,35 +204,29 @@ controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserServic
     }
 
     $scope.saveSpellsKnown = function() {
-        SpellSetupService.save({userId: userId}, $scope.spellSetup);
+        TraditionalService.save({userId: userId}, $scope.traditional);
     };
 
-    function initSpellSetup() {
-        $scope.spellSetup =
-        {
-            userId: userId,
-            known0:0,
-            known1:0,
-            known2:0,
-            known3:0,
-            known4:0,
-            known5:0,
-            known6:0,
-            known7:0,
-            known8:0,
-            known9:0,
-            picked0:[],
-            picked1:[],
-            picked2:[],
-            picked3:[],
-            picked4:[],
-            picked5:[],
-            picked6:[],
-            picked7:[],
-            picked8:[],
-            picked9:[]
-        }
+    $scope.savePP = function() {
+        PowerPointsService.save({userId: userId}, $scope.powerPoints);
     }
+
+    // function initSpellSetup() {
+    //     $scope.spellSetup =
+    //     {
+    //         userId: userId,
+    //         picked0:[],
+    //         picked1:[],
+    //         picked2:[],
+    //         picked3:[],
+    //         picked4:[],
+    //         picked5:[],
+    //         picked6:[],
+    //         picked7:[],
+    //         picked8:[],
+    //         picked9:[]
+    //     }
+    // }
 
 
 
