@@ -60,54 +60,100 @@ function($scope, UserService, PowerPointsService, TraditionalService, SpellSetup
 controllers.controller('SpellBuddyController', ['$scope', '$cookieStore', 'SpellService', 'SpellSetupService', 'PowerPointsService', 'TraditionalService',
 function($scope, $cookieStore, SpellService, SpellSetupService, PowerPointsService, TraditionalService) {
 
+    $scope.prepared = [0,0,0,0,0,0,0,0,0,0];
     $scope.user = $cookieStore.get('user');
     var userId = $scope.user.id
     $scope.spells = SpellService.get({userId:userId, spellId: 'order'});
-    $scope.spellSetup = SpellSetupService.get({userId:userId});
     if ($scope.user.powerPoints) {
         $scope.powerPoints = PowerPointsService.get({userId: $scope.user.id});
+        $scope.spellSetup = SpellSetupService.get({userId:userId});
     } else {
-        $scope.traditional = TraditionalService.get({userId: $scope.user.id});
+        TraditionalService.get({userId: $scope.user.id}).$promise.then(function(data) {
+            $scope.traditional = data;
+            SpellSetupService.get({userId:userId}).$promise.then(function(data) {
+                $scope.spellSetup = data;
+                for (var i = 0; i < 10; i++) {
+                    for (var j = 0; j < $scope.spellSetup['picked' + i].length; j++) {
+                        if ($.inArray($scope.spellSetup['picked' + i][j].id, $scope.traditional['prepared' + i]) > -1) {
+                            $scope.spellSetup['picked' + i][j].isPrepared = true;
+                            $scope.prepared[i]++;
+                        }
+                    }
+                }
+            });
+        });
     }
     //$scope.prepared = {'known0': 0,'known1': 0,'known2': 0,'known3': 0,'known4': 0,'known5': 0,'known6': 0,'known7': 0,'known8': 0,'known9': 0};
     //$scope.casted = {'known0': 0,'known1': 0,'known2': 0,'known3': 0,'known4': 0,'known5': 0,'known6': 0,'known7': 0,'known8': 0,'known9': 0};
 
 
-    $scope.prep = function(id, level, plus) {
-        var spellId = parseInt(id);
-        if (plus) {
-            $scope.traditional[level.replace('picked', 'prepared')].push(spellId);
-        } else {
-            $scope.traditional[level.replace('picked', 'prepared')] = removeValue($scope.traditional['prepared' + level.replace('picked', '')], spellId);
-        }
+    $scope.prep = function(level, plus) {
+        plus ? $scope.prepared[sanitize(level)]++ : $scope.prepared[sanitize(level)]--;
     };
 
-    $scope.isPrepared(spellId) = function() {
-        return $.inArray(spellId, $scope.traditional[level.replace('picked', 'prepared')]); > 0;
+    $scope.isPrepared = function(level, spellId) {
+        return $.inArray(spellId, $scope.traditional[level.replace('picked', 'prepared')]) > -1;
     };
 
+    $scope.maxPrepared = function(level) {
+        return $scope.traditional.knownSpells[sanitize(level)] === $scope.prepared[sanitize(level)];
+        //return $scope.traditional[level.replace('picked', 'prepared')].length === $scope.traditional.knownSpells[sanitize(level)];
+    };
 
+    $scope.getComponents = function(spell) {
+        var components = [];
+        (spell.verbalComponent) ? components.push('V') : '';
+        (spell.somaticComponent) ? components.push('S') : '';
+        (spell.materialComponent) ? components.push('M') : '';
+        (spell.arcaneFocusComponent) ? components.push('AF') : '';
+        (spell.divineFocusComponent) ? components.push('DF') : '';
+        (spell.xpComponent) ? components.push('XP') : '';
+        (spell.metaBreathComponent) ? components.push('MB') : '';
+        (spell.trueNameComponent) ? components.push('TN') : '';
+        (spell.corruptComponent) ? components.push('C') : '';
+        return components.join(', ');
+    }
+
+    $scope.getRemaining = function(level) {
+        return $scope.traditional.remainingSpells[sanitize(level)];
+    };
 
     $scope.cast = function(level) {
         if ($scope.user.powerPoints) {
-            $scope.powerPoints.remainingPoints--;
+            $scope.powerPoints.remainingPoints -= level;
             PowerPointsService.save({userId: userId}, $scope.powerPoints);
         } else {
-            $scope.traditional.remainingSpells[level]--;
+            $scope.traditional.remainingSpells[sanitize(level)]--;
             TraditionalService.save({userId:userId}, $scope.traditional);
         }
     };
 
+
     $scope.rest = function() {
         if ($scope.user.powerPoints) {
-            $scope.powerPoints.remainingPoints = $scope.PowerPoints.totalPoints;
+            $scope.powerPoints.remainingPoints = $scope.powerPoints.totalPoints;
             PowerPointsService.save({userId: userId}, $scope.powerPoints);
         } else {
-            $scope.traditional.remainingSpells = $scope.traditional;
-            TraditionalService.save({userId:userId}, $scope.traditional.knownSpells);
+
+            $scope.traditional.remainingSpells = $.extend( true, [], $scope.traditional.knownSpells );
+            var m = {};
+            for (var i = 0; i < 10; i++) {
+                var preped =  [];
+                for (var j = 0; j < $scope.spellSetup['picked' + i].length; j++) {
+                    if ($scope.spellSetup['picked' + i][j].isPrepared) {
+                        preped.push($scope.spellSetup['picked' + i][j].id);
+                    }
+                }
+                $scope.traditional['prepared' + i] = preped;
+            }
+            TraditionalService.save({userId:userId}, $scope.traditional);
         }
-        //$scope.casted = {'known0': 0,'known1': 0,'known2': 0,'known3': 0,'known4': 0,'known5': 0,'known6': 0,'known7': 0,'known8': 0,'known9': 0};
     };
+
+    function sanitize(key) {
+        return parseInt(key.replace('picked', ''));
+    }
+
 
     $scope.isPicked = function(key) {
         return key.startsWith('picked');
@@ -149,7 +195,7 @@ controllers.controller('SetupController', ['$scope', '$cookieStore', 'UserServic
     });
 
     $scope.addSpell = function(level, index) {
-        $scope.spellSetup['picked' + level].push($scope.dndSpells[index]);
+        $scope.spellSetup['picked' + level].push($scope.dndSpells[((($scope.page - 1) * $scope.pageSize) + index)]);
         SpellSetupService.save({userId: userId}, $scope.spellSetup);
         level = '';
     };

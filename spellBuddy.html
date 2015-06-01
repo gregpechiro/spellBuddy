@@ -22,8 +22,6 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-offset-1 col-lg-10">
-
-
             <div class="panel panel-default" ng-if="!user.powerPoints">
                 <div class="panel-heading">
                     <h4 class="panel-title">
@@ -32,7 +30,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="row text-center">
-                        <div ng-class="{'col-lg-offset-1': level === 0 || level === 5}" class="col-lg-2" ng-repeat="(level, spd) in traditional.knownSpells">
+                        <div ng-class="{'col-lg-offset-1': level === 0 || level === 5}" class="col-lg-2" ng-repeat="(level, spd) in traditional.knownSpells track by $index">
                             <strong>Level {{ level }}:</strong> {{ spd }}/Day
                         </div>
                     </div>
@@ -48,14 +46,12 @@
                             </div>
                             <div id="prepareCollapse" class="panel-collapse collapse">
                                 <div class="panel-body">
-                                    {{traditional}}
                                     <div class="row text-center">
                                         <div ng-class="{'col-lg-offset-1': level === 'picked0' || level === 'picked5'}" class="col-lg-2" ng-repeat="(level, levelsSpells) in spellSetup" ng-if="isPicked(level) && levelsSpells.length > 0">
                                             <label>Level {{ level | setup }}</label>
                                             <div class="checkbox text-left" ng-repeat="s in levelsSpells">
                                                 <label>
-                                                    <!-- <input type="checkbox" ng-model="s.prepared" ng-disabled="prepared[level] === user.spellsPerDay[level] && !s.prepared" ng-click="prep(level, s.prepared)"> {{ s.name }} -->
-                                                    <input type="checkbox" ng-model="stuff" ng-click="prep(s.id, level, stuff)"> {{ s.name }}
+                                                    <input type="checkbox" ng-model="s.isPrepared" ng-disabled="maxPrepared(level) && !s.isPrepared" ng-click="prep(level, s.isPrepared)"> {{ s.name }}
                                                 </label>
                                             </div>
                                         </div>
@@ -69,20 +65,35 @@
                     </div>
                 </div>
             </div>
-
+            <div class="panel panel-default" ng-if="user.powerPoints">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        Power Points
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <div class="text-center">
+                        <label>Total Power Points: </label>{{powerPoints.totalPoints}}<br>
+                        <label>Remaining Power Points: </label>{{powerPoints.remainingPoints}}
+                    </div>
+                    <div class="col-lg-offset-1 col-lg-10">
+                        <button class="btn btn-primary btn-block" ng-click="rest()" data-toggle="collapse" data-target="#prepareCollapse">Rest</button>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>
     <div class="row">
         <div class="col-lg-offset-1 col-lg-10">
             <div class="panel-group" id="spellsAccordion" role="tablist" aria-multiselectable="true">
-                <div class="panel panel-default" ng-repeat="(level, levelsSpells) in spells">
+                <div class="panel panel-default" ng-repeat="(level, levelsSpells) in spellSetup" ng-if="levelsSpells.length > 0">
                     <div class="panel-heading" role="tab" id="heading{{ level }}">
                         <h4 class="panel-title">
                             <a data-toggle="collapse" data-parent="#spellsAccordion" href="" data-target="#level{{ level }}Colapse">
-                                Level {{ level }} Spells
+                                Level {{ level | setup}} Spells
                             </a>
-                            <span class="pull-right">Spells left today {{ user.spellsPerDay[level] - casted[level]}}</span>
+                            <span class="pull-right" ng-if="!user.powerPoints">Spells left today {{ getRemaining(level) }}</span>
                         </h4>
                     </div>
                     <div id="level{{ level }}Colapse" class="panel-collapse collapse">
@@ -90,32 +101,41 @@
                             <div class="panel-group" id="level{{ level }}Accordian" role="tablist">
                                 <div class="panel panel-default" ng-repeat="s in levelsSpells">
                                     <div class="panel-heading" role="tab" id="heading{{ level }}Inner">
-                                        <h4 class="panel-title">
+                                        <h4 class="panel-title clearfix">
                                             <a data-toggle="collapse" data-parent="#level{{ level }}Accordian" href="" data-target="#spell{{ s.id }}Colapse">
                                                 {{ s.name }}
                                             </a>
-                                            <button class="btn btn-default btn-xs pull-right" ng-disabled="!s.prepared || ((user.spellsPerDay[level] - casted[level]) < 1)" ng-click="cast(level)">Cast</button>
+                                            <button class="btn btn-default btn-xs pull-right" ng-disabled="!s.isPrepared || (getRemaining(level) < 1)" ng-click="cast(level)" ng-if="!user.powerPoints">Cast</button>
+
+                                            <div class="input-group pull-right col-lg-4 input-group-sm" ng-if="user.powerPoints">
+                                                <input type="text" class="form-control" placeholder="Points" ng-model="points">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default" ng-click="cast(points); points=''">Cast</button>
+                                                </span>
+                                            </div>
                                         </h4>
                                     </div>
                                     <div id="spell{{ s.id }}Colapse" class="panel-collapse collapse">
                                         <div class="panel-body">
-                                            <h4>{{ s.school }}<span ng-show="s.spellType"> [{{ s.spellType }}]</span></h4>
+                                            <h4>{{ s.school }}<span ng-if="s.subschool"> ({{s.subschool}})</span><span ng-if="s.descriptors"> [{{ s.descriptors }}]</span></h4>
+                                            <p ng-show="s.rulebook">
+                                                {{s.rulebook}}<span ng-show="s.page"> p. {{s.page}}</span>
+                                            </p>
                                             <table>
                                                 <tbody>
-                                                    <tr><td class="text-right"><strong>Level:</strong> &nbsp;</td><td class="text-left">{{ s.level }}</td></tr>
-                                                    <tr ng-show="s.components"><td class="text-right"><strong>Components:</strong> &nbsp;</td><td class="text-left">{{ s.components }}</td></tr>
+                                                    <tr><td class="text-right"><strong>Components:</strong> &nbsp;</td><td class="text-left">{{ getComponents(s) }}</td></tr>
                                                     <tr ng-show="s.castingTime"><td class="text-right"><strong>Casting Time:</strong> &nbsp;</td><td class="text-left">{{ s.castingTime }}</td></tr>
                                                     <tr ng-show="s.spellRange"><td class="text-right"><strong>Range:</strong> &nbsp;</td><td class="text-left">{{ s.spellRange }}</td></tr>
                                                     <tr ng-show="s.area"><td class="text-right"><strong>Area:</strong> &nbsp;</td><td class="text-left">{{ s.area }}</td></tr>
                                                     <tr ng-show="s.effect"><td class="text-right"><strong>Effect:</strong> &nbsp;</td><td class="text-left">{{ s.effect }}</td></tr>
-                                                    <tr ng-show="s.spellTarget"><td class="text-right"><strong>Target:</strong> &nbsp;</td><td class="text-left">{{ s.spellTarget }}</td></tr>
-                                                    <tr ng-show="s.spellDuration"><td class="text-right"><strong>Duration:</strong> &nbsp;</td><td class="text-left">{{ s.spellDuration }}</td></tr>
+                                                    <tr ng-show="s.target"><td class="text-right"><strong>Target:</strong> &nbsp;</td><td class="text-left">{{ s.target }}</td></tr>
+                                                    <tr ng-show="s.duration"><td class="text-right"><strong>Duration:</strong> &nbsp;</td><td class="text-left">{{ s.duration }}</td></tr>
                                                     <tr ng-show="s.savingThrow"><td class="text-right"><strong>Saving Throw:</strong> &nbsp;</td><td class="text-left">{{ s.savingThrow }}</td></tr>
                                                     <tr ng-show="s.spellResistance"><td class="text-right"><strong>Spell Resistance:</strong> &nbsp;</td><td class="text-left">{{ s.spellResistance }}</td></tr>
                                                 </tbody>
                                             </table>
                                             <br>
-                                            <p>{{ s.description }}</p>
+                                            <span ng-bind-html="s.descriptionHtml"></span>
                                         </div>
                                     </div>
                                 </div>
