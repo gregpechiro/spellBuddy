@@ -8,6 +8,7 @@ controllers.controller('AdminController', ['$scope', 'UserService', 'PowerPoints
 function($scope, UserService, PowerPointsService, TraditionalService, SpellSetupService) {
 
     $scope.users = UserService.query();
+    $scope.user = {powerPoints: 0, active: 1, role: "ROLE_USER"};
 
     $scope.edit = function(userId) {
 	    $scope.user = UserService.get({userId:userId});
@@ -20,7 +21,7 @@ function($scope, UserService, PowerPointsService, TraditionalService, SpellSetup
 	}
 
     $scope.clear = function() {
-        $scope.user = {};
+        $scope.user = {powerPoints: 0, active: 1, role: "ROLE_USER"};
     };
 
     $scope.save = function() {

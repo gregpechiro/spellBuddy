@@ -41,18 +41,12 @@
                     <div class="form-group row">
                         <div class="col-xs-2">
                             <div class="radio">
-                                <label>
-                                    <input type="radio" ng-model="user.powerPoints"value="true">
-                                    Yes
-                                </label>
+                                <label><input type="radio" ng-model="user.powerPoints"value="1">Yes</label>
                             </div>
                         </div>
                         <div class="col-xs-2">
                             <div class="radio">
-                                <label>
-                                    <input type="radio" ng-model="user.powerPoints" value="false">
-                                    No
-                                </label>
+                                <label><input type="radio" ng-model="user.powerPoints" value="0">No</label>
                             </div>
                         </div>
                     </div>
@@ -60,18 +54,12 @@
                     <div class="form-group row">
                         <div class="col-xs-2">
                             <div class="radio">
-                                <label>
-                                    <input type="radio" ng-model="user.active"value="1">
-                                    Yes
-                                </label>
+                                <label><input type="radio" ng-model="user.active"value="1">Yes</label>
                             </div>
                         </div>
                         <div class="col-xs-2">
                             <div class="radio">
-                                <label>
-                                    <input type="radio" ng-model="user.active" value="0">
-                                    No
-                                </label>
+                                <label><input type="radio" ng-model="user.active" value="0">No</label>
                             </div>
                         </div>
                     </div>
@@ -91,32 +79,34 @@
                 <div class="panel-heading">
                     Users
                 </div>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Id</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Password</th>
-                            <th>Active</th>
-                            <th>Role</th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="u in users">
-                            <td>{{ u.id }}</td>
-                            <td>{{ u.name }}</td>
-                            <td>{{ u.username }}</td>
-                            <td>{{ u.password }}</td>
-                            <td>{{ u.active == 1 }}</td>
-                            <td>{{ u.role }}</td>
-                            <td><a href="" ng-click="edit(u.id)">Edit</a></td>
-                            <td><a href="" ng-click="delete(u.id)">Delete</a></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Password</th>
+                                <th>Active</th>
+                                <th>Role</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="u in users">
+                                <td>{{ u.id }}</td>
+                                <td>{{ u.name }}</td>
+                                <td>{{ u.username }}</td>
+                                <td>{{ u.password }}</td>
+                                <td>{{ u.active == 1 }}</td>
+                                <td>{{ u.role }}</td>
+                                <td><a href="" ng-click="edit(u.id)">Edit</a></td>
+                                <td><a href="" ng-click="delete(u.id)">Delete</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
