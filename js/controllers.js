@@ -28,7 +28,7 @@ function($scope, UserService, PowerPointsService, TraditionalService, SpellSetup
         var isNew = ($scope.user.id === null || $scope.user.id === undefined || $scope.user.id === '');
         UserService.save($scope.user).$promise.then(function(data) {
             $scope.users = UserService.query();
-            $scope.user = {};
+            $scope.clear();
             if (isNew) {
                 var setup = {userId: data.id}
                 if (data.powerPoints) {
